@@ -131,3 +131,75 @@ class Schema():
         temp = {"delete-copy-field": dict(copy_dict)}
         res, con_info = self.solr.transport.send_request(method='POST',endpoint=self.schema_endpoint,collection=collection, data=json.dumps(temp))
         return res
+
+    def get_schema_field_types(self, collection):
+        '''
+        Returns Schema Field Types from a Solr Collection
+        '''
+        res, con_info = self.solr.transport.send_request(endpoint='schema/fieldtypes',collection=collection)
+        return res
+
+    def does_field_type_exist(self, collection, field_type_name):
+        '''
+        Checks if the field exists will return a boolean True (exists) or False(doesn't exist).
+
+        :param string collection: Name of the collection for the action
+        :param string field_type_name: String name of the field type.
+        '''
+        schema_types = self.get_schema_field_types(collection)
+        logging.info(schema_types)
+        return True if field_type_name in [field['name'] for field in schema_types['fieldTypes']] else False
+
+    def create_field_type(self, collection, field_type_dict):
+        """
+        Creates a new field type in managed schema, will raise ValueError if the field already exists.  f
+        ield_type_dict should look like this::
+
+            {
+                 "name":"sell-by",
+                 "type":"tdate",
+                 "stored":True
+            }
+
+        Reference: https://lucene.apache.org/solr/guide/8_4/schema-api.html
+
+        """
+        if self.does_field_type_exist(collection,field_type_dict['name']):
+            raise ValueError("Field Type {} Already Exists in Solr Collection {}".format(field_type_dict['name'],collection))
+        temp = {"add-field-type":dict(field_type_dict)}
+        res, con_info = self.solr.transport.send_request(method='POST',endpoint=self.schema_endpoint,collection=collection, data=json.dumps(temp))
+        return res
+
+    def get_field_type(self, collection, field_type_name):
+        """
+        Return a dictionary with the values for a field type:
+
+        :param string collection: Name of the collection for the action
+        :param string field_type_name: Name of the field type
+        """
+        schema_types = self.get_schema_field_types(collection)
+
+        for field in schema_types['fieldTypes']:
+            if field_type_name == field['name']:
+                return field
+        raise ValueError("Field Type {} Does Not Exists in Solr Collection {}".format(field_type_name, collection))
+
+    def replace_field_type(self, collection, field_type_dict):
+        """
+        Replace a field type in managed schema, will raise ValueError if the field does not exist.
+
+        :param string collection:
+        :param dict field_type_dict:
+        """
+
+        if not self.does_field_type_exist(collection, field_type_dict['name']):
+            raise ValueError("Field Type {} does not exists in Solr Collection {}".format(
+                field_type_dict['name'], collection))
+        temp = {"replace-field-type": dict(field_type_dict)}
+        res, con_info = self.solr.transport.send_request(method='POST', endpoint=self.schema_endpoint,
+                                                         collection=collection, data=json.dumps(temp))
+        return res
+
+
+
+
