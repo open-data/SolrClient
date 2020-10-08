@@ -1,6 +1,8 @@
 import logging
 import json
 from .exceptions import *
+
+
 class Schema():
     '''
         Class for interacting with Solr collections that are using data driven schemas.
@@ -30,7 +32,6 @@ class Schema():
     def get_schema_copyfields(self, collection):
         res, con_info = self.solr.transport.send_request(endpoint='schema/copyfields', collection=collection)
         return res['copyFields']
-
 
     def create_field(self, collection, field_dict):
         '''
@@ -65,7 +66,6 @@ class Schema():
         res, con_info = self.solr.transport.send_request(method='POST', endpoint=self.schema_endpoint,
                                                          collection=collection, data=json.dumps(temp))
         return res
-    
 
     def delete_field(self,collection,field_name):
         '''
@@ -81,7 +81,6 @@ class Schema():
             res, con_info = self.solr.transport.send_request(method='POST',endpoint=self.schema_endpoint,collection=collection, data=json.dumps(temp))
             return res
 
-
     def does_field_exist(self,collection,field_name):
         '''
         Checks if the field exists will return a boolean True (exists) or False(doesn't exist).
@@ -93,7 +92,36 @@ class Schema():
         logging.info(schema)
         return True if field_name in [field['name'] for field in schema['fields']] else False
 
-    def create_copy_field(self,collection,copy_dict):
+    def get_field(self, collection, field_name):
+        """
+        Return a dictionary with the values for a field type:
+
+        :param string collection: Name of the collection for the action
+        :param string field_type_name: Name of the field type
+        """
+        schema = self.get_schema_fields(collection)
+
+        for field in schema['fieldTypes']:
+            if field_name == field['name']:
+                return field
+        raise ValueError("Field {} Does Not Exists in Solr Collection {}".format(field_name, collection))
+
+    def does_copy_field_exist(self, collection, source_field_name, dest_field_name):
+        '''
+        Checks if the field exists will return a boolean True (exists) or False(doesn't exist).
+
+        :param string collection: Name of the collection for the action
+        :param string source_field_name: Copy field source field
+        :param string dest_field_name: Copy field dest field
+        '''
+        copy_fields = self.get_schema_copyfields(collection)
+        logging.info(copy_fields)
+        for field in copy_fields:
+            if field['source'] == source_field_name and field['dest'] == dest_field_name:
+                return True
+        return False
+
+    def create_copy_field(self, collection, copy_dict):
         '''
         Creates a copy field.
 
