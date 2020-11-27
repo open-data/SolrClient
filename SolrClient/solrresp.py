@@ -6,7 +6,7 @@ from .exceptions import *
 class SolrResponse:
     def __init__(self, data):
         self.data = data
-        self.query_time = data['responseHeader']['QTime']
+        self.query_time = data['responseHeader']['QTime'] if 'QTime' in data['responseHeader'] else ''
         self.header = data['responseHeader']
 
         if 'response' in data:

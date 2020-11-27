@@ -89,7 +89,6 @@ class Schema():
         :param string field_name: String name of the field.
         '''
         schema = self.get_schema_fields(collection)
-        logging.info(schema)
         return True if field_name in [field['name'] for field in schema['fields']] else False
 
     def get_field(self, collection, field_name):
@@ -115,7 +114,6 @@ class Schema():
         :param string dest_field_name: Copy field dest field
         '''
         copy_fields = self.get_schema_copyfields(collection)
-        logging.info(copy_fields)
         for field in copy_fields:
             if field['source'] == source_field_name and field['dest'] == dest_field_name:
                 return True
@@ -175,7 +173,6 @@ class Schema():
         :param string field_type_name: String name of the field type.
         '''
         schema_types = self.get_schema_field_types(collection)
-        logging.info(schema_types)
         return True if field_type_name in [field['name'] for field in schema_types['fieldTypes']] else False
 
     def create_field_type(self, collection, field_type_dict):
