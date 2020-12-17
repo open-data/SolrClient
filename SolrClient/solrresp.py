@@ -19,23 +19,6 @@ class SolrResponse:
             if 'highlighting' in data:
                 self.hl = data['highlighting']
                 self.hl_docs = self.docs
-                for doc in self.hl_docs:
-                    if doc['id'] in self.hl:
-                        hl_entry = self.hl[doc['id']]
-                        for hl_fld_id in hl_entry:
-                            if hl_fld_id in doc and len(hl_entry[hl_fld_id]) > 0:
-                                if type(doc[hl_fld_id]) is list:
-                                    # Scan Multi-valued Solr fields for matching highlight fields
-                                    for y in hl_entry[hl_fld_id]:
-                                        y_filtered = re.sub('</mark>', '', re.sub(r'<mark>', "", y))
-                                        x = 0
-                                        for hl_fld_txt in doc[hl_fld_id]:
-                                            if hl_fld_txt == y_filtered:
-                                                doc[hl_fld_id][x] = y
-                                            x += 1
-                                else:
-                                    # Straight-forward field replacement with highlighted text
-                                    doc[hl_fld_id] = hl_entry[hl_fld_id][0]
 
         elif 'grouped' in data:
             self.groups = {}
@@ -50,6 +33,23 @@ class SolrResponse:
 
     def get_highlighting(self):
         if hasattr(self, 'hl_docs'):
+            for doc in self.hl_docs:
+                if doc['id'] in self.hl:
+                    hl_entry = self.hl[doc['id']]
+                    for hl_fld_id in hl_entry:
+                        if hl_fld_id in doc and len(hl_entry[hl_fld_id]) > 0:
+                            if type(doc[hl_fld_id]) is list:
+                                # Scan Multi-valued Solr fields for matching highlight fields
+                                for y in hl_entry[hl_fld_id]:
+                                    y_filtered = re.sub('</mark>', '', re.sub(r'<mark>', "", y))
+                                    x = 0
+                                    for hl_fld_txt in doc[hl_fld_id]:
+                                        if hl_fld_txt == y_filtered:
+                                            doc[hl_fld_id][x] = y
+                                        x += 1
+                            else:
+                                # Straight-forward field replacement with highlighted text
+                                doc[hl_fld_id] = hl_entry[hl_fld_id][0]
             return self.hl_docs
         else:
             return self.docs
