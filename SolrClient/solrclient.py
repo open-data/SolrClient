@@ -63,6 +63,24 @@ class SolrClient(object):
             raise
         self.logger.debug("Commit Successful, QTime is {}".format(resp['responseHeader']['QTime']))
 
+    def ping(self, collection, **kwargs):
+        """
+        :param str collection: The name of the collection for the request
+
+        Sends a ping to a Solr collection.
+
+        """
+
+        self.logger.debug("Sending Ping to Collection {}".format(collection))
+        try:
+            resp, con_inf = self.transport.send_request(method='GET', endpoint='admin/ping', collection=collection,
+                                                        params={}, **kwargs)
+            self.logger.debug("Ping Successful, QTime is {}".format(resp['responseHeader']['QTime']))
+            return resp
+        except Exception as e:
+            raise
+
+
     def query_raw(self, collection, query, request_handler='select', **kwargs):
         """
         :param str collection: The name of the collection for the request
