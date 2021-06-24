@@ -8,8 +8,12 @@ import re
 class SolrResponse:
     def __init__(self, data):
         self.data = data
-        self.query_time = data['responseHeader']['QTime'] if 'QTime' in data['responseHeader'] else ''
-        self.header = data['responseHeader']
+        if 'responseHeader' in data:
+            self.query_time = data['responseHeader']['QTime'] if 'QTime' in data['responseHeader'] else ''
+            self.header = data['responseHeader']
+        else:
+            self.query_time = ''
+            self.header = ''
 
         if 'response' in data:
             self.grouped = False
