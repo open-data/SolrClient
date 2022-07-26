@@ -31,6 +31,7 @@ class SolrResponse:
                 #For backwards compatability
                 self.groups = data['grouped'][field]['groups']
                 self.docs = data['grouped'][field]['groups']
+            self.num_found = len(self.docs)
         else:
             self.grouped = False
             self.docs = {}
