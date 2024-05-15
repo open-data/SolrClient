@@ -1,4 +1,4 @@
 kazoo==2.9.0
 tox==4.4.4
-requests>=2.2.1
+requests>=2.31.0
 mmh3>=2.3.1
