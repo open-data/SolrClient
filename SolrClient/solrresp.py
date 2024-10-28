@@ -54,7 +54,8 @@ class SolrResponse:
                                         x += 1
                             else:
                                 # Straight-forward field replacement with highlighted text
-                                doc[hl_fld_id] = hl_entry[hl_fld_id][0]
+                                z = re.sub(r'</mark>[\s+]<mark>', ' ', hl_entry[hl_fld_id][0])
+                                doc[hl_fld_id] = z
             return self.hl_docs
         else:
             return self.docs

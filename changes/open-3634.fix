@@ -1,0 +1,1 @@
+Search term highlighting of regular fiels is resulting in formatting that is difficult to read. Remove extraneous </mark><mark> tags from the Solr results.
