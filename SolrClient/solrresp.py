@@ -31,13 +31,28 @@ class SolrResponse:
                 #For backwards compatability
                 self.groups = data['grouped'][field]['groups']
                 self.docs = data['grouped'][field]['groups']
-            self.num_found = len(self.docs)
+                if 'highlighting' in data:
+                    self.hl = data['highlighting']
+                    self.hl_docs = self.docs
+            # Total  hits has to be calculated from all groups retunred
+            found_ctr = 0 
+            for group in self.data['grouped']:
+                found_ctr += self.data['grouped'][group]['matches']
+            self.num_found = found_ctr
+
         else:
             self.grouped = False
             self.docs = {}
 
     def get_highlighting(self):
         if hasattr(self, 'hl_docs'):
+            if hasattr(self,'grouped') and self.grouped:
+                simple_docs = []
+                for group in self.hl_docs:
+                    for dl in group["doclist"]['docs']:
+                        simple_docs.append(dl)
+                self.hl_docs = simple_docs
+
             for doc in self.hl_docs:
                 if doc['id'] in self.hl:
                     hl_entry = self.hl[doc['id']]
