@@ -37,7 +37,7 @@ class SolrResponse:
             # Total  hits has to be calculated from all groups retunred
             found_ctr = 0 
             for group in self.data['grouped']:
-                found_ctr += self.data['grouped'][group]['matches']
+                found_ctr += self.data['grouped'][group]['ngroups']
             self.num_found = found_ctr
 
         else:
