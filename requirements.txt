@@ -1,5 +1,4 @@
-kazoo==2.10.0
-tox==4.24.1
-requests>=2.32.3
-mmh3>=2.5.1
-setuptools==75.8.0
+kazoo
+tox
+requests
+mmh3
